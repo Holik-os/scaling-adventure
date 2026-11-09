@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block title %}Permintaan masuk{% endblock %}
+{% block head %}<meta http-equiv="refresh" content="15">{% endblock %}
+{% block content %}<div class="row sb"><h1>Permintaan masuk</h1>
+<button type="button" id="use-loc" class="btn blue sm">{{ 'Perbarui lokasi saya' if located else 'Urutkan dari lokasi saya' }}</button></div>
+<p class="muted">Daftar diperbarui otomatis tiap 15 detik. Lokasi Anda hanya dipakai untuk mengurutkan jarak ke titik jemput dan tidak disimpan.</p>
+<p class="muted" id="loc-msg" aria-live="polite"></p>
+{% if busy %}<div class="hint">Anda masih punya perjalanan berjalan. Selesaikan dulu di <a href="{{ url_for('my_trips') }}">Jadwal saya</a> sebelum mengambil permintaan baru.</div>{% endif %}
+{% for r in rows %}<div class="card">
+<div class="row sb"><div class="route">{{ r.pickup_name }} <span>ke</span> {{ r.dest_name }}</div><span class="price">{{ r.fare|rp }}</span></div>
+<p class="muted">{{ r.distance_km }} km{% if r.away is not none %}, titik jemput {{ r.away }} km dari Anda{% endif %}. Bagian Anda {{ r.share|rp }}.<br>
+Penumpang: {{ r.pname }}{% if r.prating[0] %}, nilai {{ r.prating[0] }} ({{ r.prating[1] }}){% endif %}{% if r.note %}<br>Catatan: {{ r.note }}{% endif %}</p>
+<div class="row">
+<form method="post" action="{{ url_for('request_take', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn" type="submit"{{ ' disabled' if busy }}>Ambil permintaan</button></form>
+<a class="btn sec sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ r.pickup_lat }},{{ r.pickup_lng }}">Lihat titik jemput</a>
+</div></div>
+{% else %}<div class="card"><p>Belum ada permintaan. Biarkan halaman ini terbuka, daftar akan muncul otomatis.</p></div>{% endfor %}{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='requests.js') }}"></script>{% endblock %}

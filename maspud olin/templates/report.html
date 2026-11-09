@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Laporkan masalah{% endblock %}
+{% block content %}<div class="card narrow"><h1>Laporkan masalah</h1>
+<div class="hint">Jika dalam bahaya, hubungi 112 atau polisi terlebih dahulu.</div>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label for="cat">Kategori</label><select id="cat" name="category" required>
+<option value="keselamatan">Keselamatan berkendara</option><option value="pelecehan">Pelecehan atau perilaku tidak pantas</option>
+<option value="tarif">Tarif atau pembayaran</option><option value="tidak-hadir">Pihak lain tidak hadir</option><option value="lainnya">Lainnya</option></select>
+<label for="d">Ceritakan apa yang terjadi</label><textarea id="d" name="detail" maxlength="1000" required></textarea>
+<p><button class="btn" type="submit">Kirim laporan</button></p></form></div>{% endblock %}

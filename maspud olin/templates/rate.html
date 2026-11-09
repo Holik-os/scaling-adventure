@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}Beri nilai{% endblock %}
+{% block content %}<div class="card narrow"><h1>Nilai {{ target_name }}</h1>
+<p class="muted">{{ b.origin_name }} ke {{ b.dest_name }}</p>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<fieldset style="border:0;padding:0"><legend>Nilai (5 = sangat baik)</legend><div class="stars">
+{% for i in range(5,0,-1) %}<label><input type="radio" name="score" value="{{ i }}" required> {{ i }}</label>{% endfor %}</div></fieldset>
+<label for="c">Komentar (opsional)</label><textarea id="c" name="comment" maxlength="300"></textarea>
+<p><button class="btn" type="submit">Kirim penilaian</button></p></form></div>{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}Permintaan saya{% endblock %}
+{% block head %}{% if r.status == 'open' or (r.status == 'taken' and b and b.status in ('confirmed','paid','ongoing')) %}<meta http-equiv="refresh" content="10">{% endif %}{% endblock %}
+{% block content %}<h1>Permintaan tumpangan</h1>
+<div class="card">
+<p class="route">{{ r.pickup_name }} <span>ke</span> {{ r.dest_name }}</p>
+<p class="muted">{{ r.distance_km }} km, tarif <b>{{ r.fare|rp }}</b>{% if r.note %}<br>Catatan: {{ r.note }}{% endif %}</p>
+{% if r.status == 'open' %}
+  <div class="hint"><b>Mencari pengemudi...</b> Halaman ini diperbarui otomatis. Permintaan kedaluwarsa pukul {{ expires }} WITA.</div>
+  <form method="post" action="{{ url_for('request_cancel', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn danger" type="submit">Batalkan permintaan</button></form>
+{% elif r.status == 'taken' and b %}
+  <p>Pengemudi: <b>{{ drv.name }}</b>, motor {{ drv.plate }}{% if rating[0] %}, nilai {{ rating[0] }} ({{ rating[1] }}){% endif %}</p>
+  <p><span class="badge {{ b.status }}">{{ status_label(b.status) }}</span></p>
+  {% if b.status == 'confirmed' %}
+    <div class="hint">Bayar sebelum <b>{{ pay_by }} WITA</b>. Kalau terlambat, pesanan dibatalkan dan permintaan dibuka lagi untuk pengemudi lain.</div>
+    <div class="row"><a class="btn" href="{{ url_for('pay', bid=b.id) }}">Bayar QRIS</a>
+    <form method="post" action="{{ url_for('booking_action', bid=b.id) }}" onsubmit="return confirm('Batalkan permintaan ini?')"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="aksi" value="batal"><button class="btn danger" type="submit">Batalkan</button></form></div>
+  {% elif b.status in ('paid','ongoing') %}
+    <p>Pembayaran diterima. WhatsApp pengemudi: <b>{{ drv.phone }}</b></p>
+    <a class="btn sec sm" href="{{ url_for('my_bookings') }}">Lihat di Pesanan saya</a>
+  {% endif %}
+{% elif r.status == 'taken' %}
+  <p>Pengemudi sudah mengambil permintaan ini. <a href="{{ url_for('my_bookings') }}">Lihat Pesanan saya</a></p>
+{% elif r.status == 'expired' %}
+  <div class="hint">Belum ada pengemudi yang mengambil, jadi permintaan ini kedaluwarsa.</div><a class="btn" href="{{ url_for('request_new') }}">Buat permintaan baru</a>
+{% else %}
+  <div class="hint">Permintaan ini dibatalkan.</div><a class="btn" href="{{ url_for('request_new') }}">Buat permintaan baru</a>
+{% endif %}
+</div>{% if r.status == 'taken' and b and b.status == 'done' %}<a href="{{ url_for('my_bookings') }}">Beri nilai di Pesanan saya</a>{% endif %}{% endblock %}

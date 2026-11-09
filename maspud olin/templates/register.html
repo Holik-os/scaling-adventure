@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block title %}Daftar{% endblock %}
+{% block content %}<div class="card narrow"><h1>Buat akun</h1>
+<p class="muted">Akun diperiksa admin sebelum bisa dipakai. Berkas hanya dilihat admin dan tidak dibagikan ke pengguna lain.</p>
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label for="role">Saya mendaftar sebagai</label>
+<select id="role" name="role"><option value="passenger" {{ 'selected' if f.get('role')!='driver' }}>Penumpang</option><option value="driver" {{ 'selected' if f.get('role')=='driver' }}>Pengemudi (punya motor)</option></select>
+<label for="nim">NIM</label><input id="nim" name="nim" inputmode="numeric" value="{{ f.get('nim','') }}" required>
+<label for="name">Nama lengkap</label><input id="name" name="name" value="{{ f.get('name','') }}" required>
+<label for="phone">Nomor WhatsApp</label><input id="phone" name="phone" inputmode="tel" placeholder="08123456789" value="{{ f.get('phone','') }}" required>
+<label for="password">Kata sandi (minimal 8 karakter)</label><input id="password" type="password" name="password" autocomplete="new-password" required>
+<label for="ktm">Foto KTM</label><input id="ktm" type="file" name="ktm" accept="image/jpeg,image/png,image/webp" required>
+<div id="driver-fields">
+<label for="plate">Plat nomor motor</label><input id="plate" name="plate" placeholder="KT 1234 AB" value="{{ f.get('plate','') }}">
+<label for="ktp">Foto KTP</label><input id="ktp" type="file" name="ktp" accept="image/jpeg,image/png,image/webp">
+<label for="sim">Foto SIM C</label><input id="sim" type="file" name="sim" accept="image/jpeg,image/png,image/webp">
+</div>
+<p><button class="btn" type="submit">Daftar</button></p></form></div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='register.js') }}"></script>{% endblock %}

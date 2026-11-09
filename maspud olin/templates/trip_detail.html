@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Detail perjalanan{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">{% endblock %}
+{% block content %}
+<h1>{{ t.origin_name }} ke {{ t.dest_name }}</h1>
+<div class="card">
+<div class="row sb"><span class="price">{{ t.fare|rp }}</span><span class="badge {{ t.status }}">{{ 'Dibuka' if t.status=='open' else 'Dibatalkan' }}</span></div>
+<p>{{ t.depart_at|waktu }} WITA, {{ t.distance_km }} km, sisa {{ left }} kursi<br>
+Pengemudi: <b>{{ t.driver_name }}</b>, motor {{ t.plate }}{% if rating[0] %}, nilai {{ rating[0] }} dari {{ rating[1] }} penilaian{% endif %}</p>
+{% if t.note %}<p class="muted">Catatan: {{ t.note }}</p>{% endif %}
+<div id="map" data-mode="view" data-olat="{{ t.origin_lat }}" data-olng="{{ t.origin_lng }}" data-dlat="{{ t.dest_lat }}" data-dlng="{{ t.dest_lng }}"></div>
+{% if is_owner %}
+  {% if t.status=='open' %}<form method="post" action="{{ url_for('trip_cancel', tid=t.id) }}" onsubmit="return confirm('Batalkan perjalanan ini?')"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn danger" type="submit">Batalkan perjalanan</button></form>{% endif %}
+{% elif mine and mine.status not in ('cancelled','rejected') %}
+  <p>Pesanan Anda: <span class="badge {{ mine.status }}">{{ status_label(mine.status) }}</span> <a href="{{ url_for('my_bookings') }}">Lihat pesanan</a></p>
+{% elif t.status!='open' or expired %}<p class="muted">Perjalanan ini sudah tidak tersedia.</p>
+{% elif left<=0 %}<p class="muted">Kursi sudah penuh.</p>
+{% else %}<form method="post" action="{{ url_for('book', tid=t.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn" type="submit">Pesan tumpangan</button></form>{% endif %}
+</div>
+{% if is_owner and passengers %}<div class="card"><h2>Penumpang</h2>
+{% for b in passengers %}<p>{{ b.pname }} <span class="badge {{ b.status }}">{{ status_label(b.status) }}</span></p>{% endfor %}
+<a href="{{ url_for('my_trips') }}">Kelola di Jadwal saya</a></div>{% endif %}
+{% endblock %}
+{% block scripts %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script><script src="{{ url_for('static', filename='map.js') }}"></script>{% endblock %}

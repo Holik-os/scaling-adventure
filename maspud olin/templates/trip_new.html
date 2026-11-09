@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Buat perjalanan{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">{% endblock %}
+{% block content %}<h1>Buat perjalanan</h1>
+<form id="trip-form" method="post" class="card"><input type="hidden" name="csrf" value="{{ csrf }}">
+<p class="muted" id="route-info" aria-live="polite"></p>
+<div id="map" data-mode="pick"></div>
+<button type="button" id="reset-map" class="btn sec sm">Ulangi pilih titik</button>
+<input type="hidden" id="olat" name="olat"><input type="hidden" id="olng" name="olng"><input type="hidden" id="dlat" name="dlat"><input type="hidden" id="dlng" name="dlng">
+<div class="row"><div style="flex:1;min-width:220px"><label for="on">Nama titik asal</label><input id="on" name="origin_name" maxlength="80" placeholder="mis. Gerbang ITK" value="{{ f.get('origin_name','') }}" required></div>
+<div style="flex:1;min-width:220px"><label for="dn">Nama titik tujuan</label><input id="dn" name="dest_name" maxlength="80" placeholder="mis. Plaza Balikpapan" value="{{ f.get('dest_name','') }}" required></div></div>
+<div class="row"><div style="flex:1;min-width:200px"><label for="dt">Jam berangkat</label><input id="dt" type="datetime-local" name="depart_at" value="{{ f.get('depart_at','') }}" required></div>
+<div style="flex:1;min-width:200px"><label for="st">Boncengan kosong</label><select id="st" name="seats"><option value="1">1 penumpang</option><option value="2" {{ 'selected' if f.get('seats')=='2' }}>2 penumpang</option></select></div></div>
+<label for="nt">Catatan untuk penumpang (opsional)</label><input id="nt" name="note" maxlength="200" placeholder="mis. bawa helm sendiri bila ada" value="{{ f.get('note','') }}">
+<div class="hint">Tarif otomatis: Rp5.000 untuk 5 km pertama, lalu Rp1.000 per km. Anda menerima 80%, MASPUT 20%. Waktu memakai WITA.</div>
+<button class="btn" type="submit">Terbitkan perjalanan</button></form>{% endblock %}
+{% block scripts %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script><script src="{{ url_for('static', filename='map.js') }}"></script>{% endblock %}

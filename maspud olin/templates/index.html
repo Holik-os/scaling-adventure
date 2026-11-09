@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% block title %}Beranda{% endblock %}
+{% block content %}
+{% set ready = me and me.role != 'admin' and me.phone_verified and me.status == 'approved' %}
+{% if ready %}
+<div class="card"><h1>Butuh tumpangan sekarang?</h1>
+<p class="muted">Tentukan titik jemput dan tujuan. Pengemudi yang sedang aktif akan mengambil permintaan Anda, dan tarif tidak berubah setelah dipesan.</p>
+<a class="btn" href="{{ url_for('request_new') }}">Minta tumpangan</a></div>
+{% if me.role == 'driver' %}<div class="card"><h2>Mau menerima penumpang?</h2>
+<p class="muted">Buka daftar permintaan dari penumpang, pilih yang paling dekat dengan Anda, lalu ambil.</p>
+<a class="btn blue" href="{{ url_for('requests_open') }}">Lihat permintaan masuk</a></div>{% endif %}
+{% elif me and me.role == 'admin' %}
+<div class="card"><h1>Beranda</h1><a class="btn" href="{{ url_for('admin') }}">Buka dasbor admin</a></div>
+{% else %}
+<div class="card"><h1>Tumpangan dari sesama mahasiswa ITK</h1>
+<p class="muted">Pesan motor tebengan dengan titik jemput yang Anda pilih sendiri. Daftar dengan NIM dan KTM agar akun diverifikasi admin.</p>
+<div class="row"><a class="btn" href="{{ url_for('register') }}">Daftar</a><a class="btn sec" href="{{ url_for('login') }}">Masuk</a></div></div>
+{% endif %}
+{% if scheduled %}
+<h2>Jadwal pengemudi</h2>
+<form class="card" method="get">
+  <div class="row"><div style="flex:2;min-width:200px"><label for="q">Asal atau tujuan</label><input id="q" name="q" value="{{ qtext }}" placeholder="mis. ITK, Plaza Balikpapan"></div>
+  <div style="flex:1;min-width:160px"><label for="tg">Tanggal</label><input id="tg" type="date" name="tanggal" value="{{ date }}"></div>
+  <div style="align-self:end"><button class="btn blue" type="submit">Cari</button></div></div>
+</form>
+{% if trips %}<div class="grid">
+{% for t in trips %}
+<a class="card trip" href="{{ url_for('trip_detail', tid=t.id) }}">
+  <div class="route">{{ t.origin_name }} <span>ke</span> {{ t.dest_name }}</div>
+  <div class="muted">{{ t.depart_at|waktu }}</div>
+  <div class="row sb"><span class="price">{{ t.fare|rp }}</span><span class="muted">{{ t.distance_km }} km, sisa {{ t.left }} kursi</span></div>
+  <div class="muted">{{ t.driver_name }}{% if t.rating[0] %} - nilai {{ t.rating[0] }} ({{ t.rating[1] }}){% else %} - belum ada nilai{% endif %}</div>
+</a>{% endfor %}</div>
+{% else %}<div class="card"><p>Belum ada jadwal yang cocok.</p></div>{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}Terjadi masalah{% endblock %}
+{% block content %}<div class="card narrow"><h1>{{ code }}</h1><p>{{ msg or "Halaman tidak dapat ditampilkan." }}</p><a class="btn" href="{{ url_for('index') }}">Kembali ke beranda</a></div>{% endblock %}

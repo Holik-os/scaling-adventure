@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Status akun{% endblock %}
+{% block content %}<div class="card narrow">
+{% if me.status == 'pending' %}<h1>Menunggu persetujuan admin</h1><p>Nomor Anda sudah terverifikasi. Admin sedang memeriksa KTM{% if me.role=='driver' %}, KTP, dan SIM{% endif %} Anda. Coba masuk lagi nanti.</p>
+{% elif me.status == 'rejected' %}<h1>Pendaftaran ditolak</h1><p>Alasan: {{ me.reject_reason or 'tidak dicantumkan' }}.</p><p class="muted">Hubungi admin atau daftar ulang dengan berkas yang benar.</p>
+{% else %}<h1>Akun ditangguhkan</h1><p>Hubungi admin untuk informasi lebih lanjut.</p>{% endif %}
+</div>{% endblock %}

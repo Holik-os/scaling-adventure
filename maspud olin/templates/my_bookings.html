@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Pesanan saya{% endblock %}
+{% block content %}<h1>Pesanan saya</h1>
+{% for b in rows %}<div class="card">
+<div class="row sb"><div class="route">{{ b.origin_name }} <span>ke</span> {{ b.dest_name }}</div><span class="badge {{ b.status }}">{{ status_label(b.status) }}</span></div>
+<p class="muted">{{ b.depart_at|waktu }} WITA, {{ b.distance_km }} km, {{ b.fare|rp }}<br>Pengemudi: {{ b.driver_name }}, motor {{ b.plate }}
+{% if b.status in ('paid','ongoing','done') %}<br>WhatsApp pengemudi: {{ b.driver_phone }}{% endif %}</p>
+<div class="row">
+{% if b.status == 'confirmed' %}<a class="btn" href="{{ url_for('pay', bid=b.id) }}">Bayar QRIS</a>{% endif %}
+{% if b.status in ('requested','confirmed') %}<form method="post" action="{{ url_for('booking_action', bid=b.id) }}" onsubmit="return confirm('Batalkan pesanan?')"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="aksi" value="batal"><button class="btn danger sm" type="submit">Batalkan</button></form>{% endif %}
+{% if b.status == 'done' and not b.rated %}<a class="btn blue sm" href="{{ url_for('rate', bid=b.id) }}">Beri nilai</a>{% endif %}
+{% if b.status in ('paid','ongoing','done') %}<a class="btn sec sm" href="{{ url_for('report', bid=b.id) }}">Laporkan masalah</a>{% endif %}
+<a class="btn sec sm" href="{{ url_for('trip_detail', tid=b.trip_id) }}">Lihat rute</a>
+</div></div>
+{% else %}<div class="card"><p>Belum ada pesanan. <a href="{{ url_for('index') }}">Cari tumpangan</a></p></div>{% endfor %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Bayar{% endblock %}
+{% block content %}<div class="card narrow"><h1>Bayar {{ b.fare|rp }}</h1>
+<p class="muted">{{ b.origin_name }} ke {{ b.dest_name }}, {{ b.depart_at|waktu }} WITA</p>
+{% if deadline %}<div class="hint">Bayar sebelum <b>{{ deadline }} WITA</b>. Jika terlambat, pesanan dibatalkan dan permintaan dibuka lagi untuk pengemudi lain.</div>{% endif %}
+{% if payment_mode == 'simulation' %}
+ <div class="hint">Mode simulasi: tidak ada uang yang dipindahkan.</div>
+ <form method="post" action="{{ url_for('pay_simulate', bid=b.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn" type="submit">Simulasikan pembayaran berhasil</button></form>
+{% else %}
+ {% if b.qr_url %}<img class="qr" src="{{ b.qr_url }}" alt="Kode QRIS untuk pembayaran {{ b.fare|rp }}">{% endif %}
+ <p>Buka aplikasi e-wallet atau mobile banking, pilih bayar QRIS, lalu pindai kode di atas.</p>
+ <form method="post" action="{{ url_for('pay_check', bid=b.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn" type="submit">Saya sudah membayar</button></form>
+ <form method="post" style="margin-top:.6rem"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="aksi" value="buat_ulang"><button class="btn sec sm" type="submit">Buat kode baru</button></form>
+{% endif %}</div>{% endblock %}

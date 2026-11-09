@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}MASPUT{% endblock %} - tebengan antar mahasiswa ITK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="top"><div class="bar">
+  <a class="brand" href="{{ url_for('index') }}">MAS<b>PUT</b></a>
+  {% if me %}
+    {% if me.role == 'admin' %}<a class="nl" href="{{ url_for('admin') }}">Admin</a>
+    {% elif me.phone_verified and me.status == 'approved' %}
+      <a class="nl" href="{{ url_for('request_new') }}">Minta tumpangan</a>
+      {% if me.role == 'driver' %}<a class="nl" href="{{ url_for('requests_open') }}">Permintaan masuk</a><a class="nl" href="{{ url_for('my_trips') }}">Perjalanan saya</a>{% endif %}
+      {% if scheduled %}<a class="nl" href="{{ url_for('index') }}">Jadwal pengemudi</a>{% endif %}
+      <a class="nl" href="{{ url_for('my_bookings') }}">Pesanan saya</a>
+    {% endif %}
+    <span class="muted" style="color:#9fb3bd">{{ me.name }}</span>
+    <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn link" type="submit">Keluar</button></form>
+  {% else %}
+    <a class="nl" href="{{ url_for('login') }}">Masuk</a><a class="btn sm" href="{{ url_for('register') }}">Daftar</a>
+  {% endif %}
+</div></header>
+<main>
+{% with msgs = get_flashed_messages(with_categories=true) %}{% for c, m in msgs %}<div class="flash {{ c }}" role="alert">{{ m }}</div>{% endfor %}{% endwith %}
+{% if payment_mode == 'simulation' %}<div class="hint">Mode pengembangan: pembayaran masih simulasi dan tidak memindahkan uang sungguhan.</div>{% endif %}
+{% block content %}{% endblock %}
+</main>
+<footer>MASPUT - bikepooling mahasiswa ITK. Gunakan helm, patuhi lalu lintas, dan laporkan masalah lewat halaman pesanan.</footer>
+{% block scripts %}{% endblock %}
+</body></html>

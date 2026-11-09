@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block title %}Admin{% endblock %}
+{% block content %}<h1>Dasbor admin</h1>
+<div class="stats">
+<div class="stat">Pengguna<b>{{ s.users }}</b></div><div class="stat">Menunggu persetujuan<b>{{ s.pending }}</b></div>
+<div class="stat">Perjalanan<b>{{ s.trips }}</b></div><div class="stat">Nilai transaksi<b>{{ s.gmv|rp }}</b></div>
+<div class="stat">Pendapatan MASPUT (20%)<b>{{ s.commission|rp }}</b></div><div class="stat">Utang bagi hasil pengemudi<b>{{ s.payout_due|rp }}</b></div>
+<div class="stat">Laporan terbuka<b>{{ s.reports }}</b></div></div>
+<div class="card"><h2>Menunggu verifikasi</h2>
+{% for u in pending %}<div class="row sb" style="padding:.4rem 0"><div>{{ u.name }} ({{ u.nim }}) <span class="badge">{{ 'Pengemudi' if u.role=='driver' else 'Penumpang' }}</span></div><a class="btn sm blue" href="{{ url_for('admin_user', uid=u.id) }}">Periksa berkas</a></div>{% else %}<p class="muted">Tidak ada antrean.</p>{% endfor %}</div>
+<div class="card" id="laporan"><h2>Laporan</h2><div class="tablewrap"><table><tr><th>Dari</th><th>Tentang</th><th>Kategori</th><th>Isi</th><th></th></tr>
+{% for r in reports %}<tr><td>{{ r.fname }}</td><td>{{ r.aname or '-' }}</td><td>{{ r.category }}</td><td>{{ r.detail }}{% if r.admin_note %}<br><span class="muted">Catatan: {{ r.admin_note }}</span>{% endif %}</td>
+<td>{% if r.status=='open' %}<form method="post" action="{{ url_for('admin_report', rid=r.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input name="note" placeholder="Catatan tindak lanjut" aria-label="Catatan"><button class="btn sm" type="submit">Selesai</button></form>{% else %}<span class="badge">Selesai</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">Belum ada laporan.</td></tr>{% endfor %}</table></div></div>
+<div class="card" id="transaksi"><h2>Transaksi</h2><div class="tablewrap"><table><tr><th>Rute</th><th>Penumpang</th><th>Pengemudi</th><th>Tarif</th><th>MASPUT</th><th>Pengemudi</th><th>Status</th><th></th></tr>
+{% for b in tx %}<tr><td>{{ b.origin_name }} ke {{ b.dest_name }}</td><td>{{ b.pname }}</td><td>{{ b.dname }}</td><td>{{ b.fare|rp }}</td><td>{{ b.commission|rp }}</td><td>{{ b.driver_share|rp }}</td><td>{{ status_label(b.status) }}</td>
+<td>{% if b.status=='done' and not b.payout_at %}<form method="post" action="{{ url_for('admin_payout', bid=b.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn sm sec" type="submit">Tandai sudah dibayarkan</button></form>{% elif b.payout_at %}<span class="muted">Dibayarkan</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="8" class="muted">Belum ada transaksi.</td></tr>{% endfor %}</table></div></div>
+<div class="card"><h2>Semua pengguna</h2><div class="tablewrap"><table><tr><th>Nama</th><th>NIM</th><th>Peran</th><th>Status</th><th></th></tr>
+{% for u in users %}<tr><td>{{ u.name }}</td><td>{{ u.nim }}</td><td>{{ u.role }}</td><td><span class="badge {{ u.status }}">{{ u.status }}</span>{% if not u.phone_verified %} <span class="muted">(nomor belum terverifikasi)</span>{% endif %}</td><td><a href="{{ url_for('admin_user', uid=u.id) }}">Buka</a></td></tr>{% endfor %}</table></div></div>
+{% endblock %}

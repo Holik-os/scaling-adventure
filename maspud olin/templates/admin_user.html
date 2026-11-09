@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Periksa pengguna{% endblock %}
+{% block content %}<h1>{{ u.name }}</h1>
+<div class="card"><p>NIM {{ u.nim }}, WhatsApp {{ u.phone }} {{ '(terverifikasi)' if u.phone_verified else '(belum terverifikasi)' }}<br>
+Peran: {{ u.role }}{% if u.plate %}, plat {{ u.plate }}{% endif %}<br>Status: <span class="badge {{ u.status }}">{{ u.status }}</span>{% if rating[0] %}, nilai {{ rating[0] }} ({{ rating[1] }}){% endif %}</p>
+<p class="muted">Cocokkan nama dan NIM di KTM dengan data pendaftaran{% if u.role=='driver' %}; pastikan SIM C masih berlaku dan nama sama dengan KTP{% endif %}.</p></div>
+<div class="card docs"><div class="grid">
+{% for k in ['ktm','ktp','sim'] %}{% if u[k+'_file'] %}<div><h3>{{ k|upper }}</h3><a href="{{ url_for('user_file', uid=u.id, kind=k) }}" target="_blank" rel="noopener"><img src="{{ url_for('user_file', uid=u.id, kind=k) }}" alt="Foto {{ k|upper }} {{ u.name }}"></a></div>{% endif %}{% endfor %}</div></div>
+{% if u.role != 'admin' %}<div class="card"><div class="row">
+<form method="post" action="{{ url_for('admin_user_status', uid=u.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="approved"><button class="btn blue" type="submit">Setujui</button></form>
+<form method="post" action="{{ url_for('admin_user_status', uid=u.id) }}" class="row"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="rejected"><input name="reason" placeholder="Alasan penolakan" aria-label="Alasan penolakan" style="width:260px"><button class="btn danger" type="submit">Tolak</button></form>
+<form method="post" action="{{ url_for('admin_user_status', uid=u.id) }}" onsubmit="return confirm('Tangguhkan akun ini?')"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="suspended"><button class="btn danger" type="submit">Tangguhkan</button></form>
+</div></div>{% endif %}{% endblock %}

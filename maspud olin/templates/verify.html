@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Verifikasi nomor{% endblock %}
+{% block content %}<div class="card narrow"><h1>Verifikasi WhatsApp</h1>
+<p>Kami mengirim kode 6 digit ke nomor berakhiran <b>{{ phone_tail }}</b>. Kode berlaku 5 menit.</p>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label for="code">Kode verifikasi</label><input id="code" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+<p><button class="btn" type="submit">Verifikasi</button></p></form>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="aksi" value="kirim_ulang"><button class="btn sec sm" type="submit">Kirim ulang kode</button></form></div>{% endblock %}
